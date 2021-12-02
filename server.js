@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const jobsRouter = require('./routes/jobs.router');
-const PORT = 8000;
+const PORT = process.env.PORT ||  8000;
 
 app.use('/jobs', jobsRouter);
 
