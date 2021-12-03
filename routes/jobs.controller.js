@@ -65,7 +65,6 @@ async function loadAllJobs() {
         }
     } catch (error) {
         console.error(error);
-        res.send('Some error there !!');
     }
 }
 
