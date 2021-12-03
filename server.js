@@ -15,6 +15,7 @@ app.get('/*', (req, res) => {
 
 async function startServer() {
     await loadAllJobs();
+    console.log('All Data Loaded!!!');
     app.listen(PORT, () => {
         console.log(`Server is listening on port ${PORT}`);
     });
