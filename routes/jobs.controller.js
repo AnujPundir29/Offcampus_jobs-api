@@ -2,7 +2,6 @@ const cheerio = require('cheerio');
 const axios = require('axios');
 
 const jobs = [];
-const app = []
 
 async function getUrlandTitle(URL, param) {
     const response = await axios.get(URL);
@@ -33,27 +32,19 @@ async function httpGetAllJobs(req, res) {
         const jobsData = await getUrlandTitle(WEB_URL, 'a:contains("Off Campus")');
 
         for (var i = 0; i < jobsData.length; i++) {
-            const title = jobsData[i].attribs.title;
+            const title = jobsData[i].attribs.title + '';
             const url = jobsData[i].attribs.href;
             var result = jobs.filter(x => x.title === title);
-            if (result.length === 0 && title) {
+            if (result.length === 0 && title !== "undefined") {
+                const id = title.split(' ')[0];
                 jobs.push({
+                    id,
                     title,
                     url,
+                    apply: 'http://localhost:8000/jobs/' + id,
                 });
             }
         }
-
-        // for (var i = 0; i < jobs.length; ++i) {
-        //     const URL = jobs[i]['url'];
-            
-        //     const applyData = await getUrlandTitle(URL, '.dblclick_btn');
-
-        //     const url = applyData[0].attribs.href;
-        //     jobs[i] = Object.assign(jobs[i], {
-        //         'apply': url
-        //     });
-        // }
         res.json(jobs);
 
     } catch (error) {
@@ -61,6 +52,29 @@ async function httpGetAllJobs(req, res) {
     }
 }
 
+async function httpGetJobById(req, res) {
+    try {
+        const id = req.params.id;
+        const job = jobs.find(job => job.id === id);
+        const JOB_URL = job.url;
+        const applyData = await getUrlandTitle(JOB_URL, '.dblclick_btn');
+
+        const url = applyData[0].attribs.href;
+
+        const response = await axios.get(url);
+
+        const html = await response.data;
+
+        res.send(html);
+
+
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
 module.exports = {
-    httpGetAllJobs
+    httpGetAllJobs,
+    httpGetJobById
 }
