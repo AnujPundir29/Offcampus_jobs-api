@@ -44,16 +44,16 @@ async function httpGetAllJobs(req, res) {
             }
         }
 
-        for (var i = 0; i < jobs.length; ++i) {
-            const URL = jobs[i]['url'];
+        // for (var i = 0; i < jobs.length; ++i) {
+        //     const URL = jobs[i]['url'];
             
-            const applyData = await getUrlandTitle(URL, '.dblclick_btn');
+        //     const applyData = await getUrlandTitle(URL, '.dblclick_btn');
 
-            const url = applyData[0].attribs.href;
-            jobs[i] = Object.assign(jobs[i], {
-                'apply': url
-            });
-        }
+        //     const url = applyData[0].attribs.href;
+        //     jobs[i] = Object.assign(jobs[i], {
+        //         'apply': url
+        //     });
+        // }
         res.json(jobs);
 
     } catch (error) {
