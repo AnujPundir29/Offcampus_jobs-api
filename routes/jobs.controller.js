@@ -48,7 +48,7 @@ async function httpGetAllJobs(req, res) {
                     id,
                     title,
                     url,
-                    apply: 'https://offcampus-jobs.herokuapp.com/jobs/' + id,
+                    apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
                 });
             }
         }
