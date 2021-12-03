@@ -1,5 +1,7 @@
 const cheerio = require('cheerio');
 const axios = require('axios');
+const NodeCache = require("node-cache");
+const serverCache = new NodeCache();
 
 const jobs = [];
 
@@ -28,24 +30,33 @@ async function getUrlandTitle(URL, param) {
 
 async function httpGetAllJobs(req, res) {
     try {
-        const WEB_URL = 'https://www.studentscircles.com/category/it-jobs/';
-        const jobsData = await getUrlandTitle(WEB_URL, 'a:contains("Off Campus")');
+        if (serverCache.has('allJobs')) {
 
-        for (var i = 0; i < jobsData.length; i++) {
-            const title = jobsData[i].attribs.title + '';
-            const url = jobsData[i].attribs.href;
-            var result = jobs.filter(x => x.title === title);
-            if (result.length === 0 && title !== "undefined") {
-                const id = title.split(' ')[0];
-                jobs.push({
-                    id,
-                    title,
-                    url,
-                    apply: 'http://localhost:8000/jobs/' + id,
-                });
+            console.log('Retrieved value from cache !!')
+            res.json(serverCache.get('allJobs'));
+        } else {
+            const WEB_URL = 'https://www.studentscircles.com/category/it-jobs/';
+            const jobsData = await getUrlandTitle(WEB_URL, 'a:contains("Off Campus")');
+
+            for (var i = 0; i < jobsData.length; i++) {
+                const title = jobsData[i].attribs.title + '';
+                const url = jobsData[i].attribs.href;
+                var result = jobs.filter(x => x.title === title);
+                if (result.length === 0 && title !== "undefined") {
+                    const id = title.split(' ')[0];
+                    jobs.push({
+                        id,
+                        title,
+                        url,
+                        apply: 'https://offcampus-jobs.herokuapp.com/jobs/' + id,
+                    });
+                }
             }
+
+            serverCache.set('allJobs', jobs)
+            console.log('Value not present in cache, performing computation')
+            res.json(jobs);
         }
-        res.json(jobs);
 
     } catch (error) {
         console.log(error);
@@ -54,20 +65,24 @@ async function httpGetAllJobs(req, res) {
 
 async function httpGetJobById(req, res) {
     try {
-        const id = req.params.id;
-        const job = jobs.find(job => job.id === id);
-        const JOB_URL = job.url;
-        const applyData = await getUrlandTitle(JOB_URL, '.dblclick_btn');
+        if (serverCache.has('jobById')) {
+            console.log('Retrieved value from cache !!')
+            res.send(serverCache.get('jobById'));
+        } else {
 
-        const url = applyData[0].attribs.href;
+            const id = req.params.id;
+            const job = jobs.find(job => job.id === id);
+            const JOB_URL = job.url;
+            const applyData = await getUrlandTitle(JOB_URL, '.dblclick_btn');
 
-        const response = await axios.get(url);
+            const url = applyData[0].attribs.href;
+            const response = await axios.get(url);
+            const html = await response.data;
 
-        const html = await response.data;
-
-        res.send(html);
-
-
+            serverCache.set('jobById', html)
+            console.log('Value not present in cache, performing computation')
+            res.send(html);
+        }
     } catch (error) {
         console.log(error);
     }
