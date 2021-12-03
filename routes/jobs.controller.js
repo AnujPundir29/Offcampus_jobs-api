@@ -57,8 +57,8 @@ async function loadAllJobs() {
                         title,
                         url,
                         source: platform.source,
-                        // apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
-                        apply: 'http://localhost:8000/jobs/' + id,
+                        apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
+                        // apply: 'http://localhost:8000/jobs/' + id,
                     });
                 }
             }
