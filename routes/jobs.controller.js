@@ -65,10 +65,10 @@ async function httpGetAllJobs(req, res) {
 
 async function httpGetJobById(req, res) {
     try {
-        if (serverCache.has('jobById')) {
-            console.log('Retrieved value from cache !!')
-            res.send(serverCache.get('jobById'));
-        } else {
+        // if (serverCache.has('jobById')) {
+        //     console.log('Retrieved value from cache !!')
+        //     res.send(serverCache.get('jobById'));
+        // } else {
 
             const id = req.params.id;
             const job = jobs.find(job => job.id === id);
@@ -79,10 +79,10 @@ async function httpGetJobById(req, res) {
             const response = await axios.get(url);
             const html = await response.data;
 
-            serverCache.set('jobById', html)
-            console.log('Value not present in cache, performing computation')
+            // serverCache.set('jobById', html)
+            // console.log('Value not present in cache, performing computation')
             res.send(html);
-        }
+        // }
     } catch (error) {
         console.log(error);
     }
