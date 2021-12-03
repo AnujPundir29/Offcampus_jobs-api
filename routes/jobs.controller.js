@@ -70,14 +70,7 @@ async function loadAllJobs() {
 
 async function httpGetAllJobs(req, res) {
     try {
-        if (serverCache.has('allJobs')) {
-            console.log('Retrieved value from cache !!')
-            res.json(serverCache.get('allJobs'));
-        } else {
-            serverCache.set('allJobs', jobs)
-            console.log('Value not present in cache, performing computation')
-            res.json(jobs);
-        }
+        res.json(jobs);
     } catch (error) {
         console.log(error);
         res.send('Some error there !!');
