@@ -2,7 +2,9 @@ const express = require('express');
 const app = express();
 const helmet = require('helmet');
 const jobsRouter = require('./routes/jobs.router');
-const {loadAllJobs} = require('./routes/jobs.controller');
+const {
+    loadAllJobs
+} = require('./routes/jobs.controller');
 const PORT = process.env.PORT || 8000;
 
 app.use(helmet());
@@ -14,7 +16,9 @@ app.get('/*', (req, res) => {
 });
 
 async function startServer() {
+    console.time('test');    
     await loadAllJobs();
+    console.timeEnd('test'); //Prints something like that-> test: 11374.004ms
     console.log('All Data Loaded!!!');
     app.listen(PORT, () => {
         console.log(`Server is listening on port ${PORT}`);

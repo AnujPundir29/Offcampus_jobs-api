@@ -7,12 +7,12 @@ const jobs = [];
 
 const platforms = [{
         source: 'studentscircles',
-        address: 'https://www.studentscircles.com/category/it-jobs/',
+        address: 'https://www.studentscircles.com/category/it-jobs/page/',
     },
-    {
-        source: 'offcampusjobs4u',
-        address: 'https://www.offcampusjobs4u.com/',
-    },
+    // {
+    //     source: 'offcampusjobs4u',
+    //     address: 'https://www.offcampusjobs4u.com/',
+    // },
 ];
 
 
@@ -43,23 +43,25 @@ async function loadAllJobs() {
     try {
         for (let j = 0; j < platforms.length; j++) {
             const platform = platforms[j];
-            const WEB_URL = platform.address;
-            const jobsData = await getUrlandTitle(WEB_URL, 'a:contains("Off Campus")');
+            for (let page = 1; page <= 3; page++) {
+                const WEB_URL = platform.address + page;
+                const jobsData = await getUrlandTitle(WEB_URL, 'a:contains("2022")');
 
-            for (var i = 0; i < jobsData.length; i++) {
-                const title = jobsData[i].attribs.title + '';
-                const url = jobsData[i].attribs.href + '';
-                var result = jobs.filter(x => x.title === title);
-                if (result.length === 0 && title !== "undefined") {
-                    const id = title.split(' ')[0].replace(/\s/g, '');
-                    jobs.push({
-                        id,
-                        title,
-                        url,
-                        source: platform.source,
-                        apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
-                        // apply: 'http://localhost:8000/jobs/' + id,
-                    });
+                for (var i = 0; i < jobsData.length; i++) {
+                    const title = jobsData[i].attribs.title + '';
+                    const url = jobsData[i].attribs.href + '';
+                    var result = jobs.filter(x => x.title === title);
+                    if (result.length === 0 && title !== "undefined") {
+                        const id = title.split(' ')[0].replace(/\s/g, '');
+                        jobs.push({
+                            id,
+                            title,
+                            url,
+                            source: platform.source,
+                            // apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
+                            apply: 'http://localhost:8000/jobs/' + id,
+                        });
+                    }
                 }
             }
         }
