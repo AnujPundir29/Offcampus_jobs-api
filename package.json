@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "engines": {
+    "node": "14.17.0",
+    "npm": "8.1.2"
+  },
   "scripts": {
     "watch": "nodemon server.js",
     "start": "nodemon server.js",
@@ -16,7 +20,6 @@
     "express": "^4.17.1",
     "helmet": "^4.6.0",
     "node-cache": "^5.1.2",
-    "nodemon": "^2.0.15",
-    "pm2": "^5.1.2"
+    "nodemon": "^2.0.15"
   }
 }
