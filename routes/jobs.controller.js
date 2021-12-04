@@ -5,15 +5,14 @@ const serverCache = new NodeCache();
 
 const jobs = [];
 
-const platforms = [
-    // {
-    //     source: 'studentscircles',
-    //     address: 'https://www.studentscircles.com/category/it-jobs/page/',
-    // },
-    {
-        source: 'offcampusjobs4u',
-        address: 'https://www.offcampusjobs4u.com/',
+const platforms = [{
+        source: 'studentscircles',
+        address: 'https://www.studentscircles.com/category/it-jobs/page/',
     },
+    // {
+    //     source: 'offcampusjobs4u',
+    //     address: 'https://www.offcampusjobs4u.com/',
+    // },
 ];
 
 
@@ -59,7 +58,7 @@ async function loadAllJobs_1() {
                             title,
                             url,
                             source: platform.source,
-                            // apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
+                            apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
                             // apply: 'http://localhost:8000/jobs/' + id,
                         });
                     }
@@ -70,36 +69,6 @@ async function loadAllJobs_1() {
         console.error(error);
     }
 }
-
-async function loadAllJobs_2() {
-    try {
-        for (let j = 0; j < platforms.length; j++) {
-            const platform = platforms[j];
-            const WEB_URL = platform.address;
-            const jobsData = await getUrlandTitle(WEB_URL, 'a:contains("Off Campus")');
-
-            for (var i = 0; i < jobsData.length; i++) {
-                const title = jobsData[i].attribs.title + '';
-                const url = jobsData[i].attribs.href + '';
-                var result = jobs.filter(x => x.title === title);
-                if (result.length === 0 && title !== "undefined") {
-                    const id = title.split(' ')[0].replace(/\s/g, '');
-                    jobs.push({
-                        id,
-                        title,
-                        url,
-                        source: platform.source,
-                        apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
-                        // apply: 'http://localhost:8000/jobs/' + id,
-                    });
-                }
-            }
-        }
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 
 async function httpGetAllJobs(req, res) {
     try {
@@ -142,7 +111,6 @@ async function httpGetJobById(req, res) {
 
 module.exports = {
     loadAllJobs_1,
-    loadAllJobs_2,
     httpGetAllJobs,
     httpGetJobById
 }
