@@ -3,7 +3,9 @@ const axios = require('axios');
 const NodeCache = require("node-cache");
 const serverCache = new NodeCache();
 
-const jobs = [];
+var jobs = [];
+// var jobProfile = [];
+var category = {};
 
 const platforms = [{
         source: 'studentscircles',
@@ -11,13 +13,17 @@ const platforms = [{
     },
     // {
     //     source: 'offcampusjobs4u',
-    //     address: 'https://www.offcampusjobs4u.com/',
+    //     address: 'https://www.offcampusjobs4u.com',
     // },
 ];
 
 
 async function getUrlandTitle(URL, param) {
-    const response = await axios.get(URL);
+    const headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36',
+    };
+
+    const response = await axios.get(URL, headers);
 
     const html = await response.data;
     const $ = cheerio.load(html);
@@ -43,7 +49,7 @@ async function loadAllJobs_1() {
     try {
         for (let j = 0; j < platforms.length; j++) {
             const platform = platforms[j];
-            for (let page = 1; page <= 3; page++) {
+            for (let page = 1; page <= 5; page++) {
                 const WEB_URL = platform.address + page;
                 const jobsData = await getUrlandTitle(WEB_URL, 'a:contains("2022")');
 
@@ -61,6 +67,16 @@ async function loadAllJobs_1() {
                             apply: 'https://offcampus-job.herokuapp.com/jobs/' + id,
                             // apply: 'http://localhost:8000/jobs/' + id,
                         });
+                        var jobProfile = title.split('|')[1].trim();
+                        var jobProfileId = jobProfile.replace(/\s/g, '');
+                        if(jobProfile.indexOf('Software') !== -1){
+                            jobProfile = 'Software';
+                            jobProfileId = 'Software';
+                        }
+                        category[jobProfile] = {
+                            View: 'https://offcampus-job.herokuapp.com/jobs/category/' + jobProfileId
+                            // View: 'http://localhost:8000/jobs/category/' + jobProfileId
+                        };
                     }
                 }
             }
@@ -72,10 +88,19 @@ async function loadAllJobs_1() {
 
 async function httpGetAllJobs(req, res) {
     try {
-        res.json(jobs);
+        return res.status(200).json(jobs);
     } catch (error) {
         console.log(error);
-        res.send('Some error there !!');
+        return res.send('Some error there !!');
+    }
+}
+
+async function httpGetJobsByCategory(req, res) {
+    try {
+        return res.status(200).json(category);
+    } catch (error) {
+        console.log(error);
+        return res.send('Some error there !!');
     }
 }
 
@@ -84,7 +109,7 @@ async function httpGetJobById(req, res) {
         const id = req.params.id;
         if (serverCache.has(id)) {
             console.log('Retrieved value from cache !!')
-            res.redirect(serverCache.get(id));
+            return res.redirect(serverCache.get(id));
         } else {
             const job = jobs.find(job => job.id === id);
             const JOB_URL = job.url;
@@ -99,18 +124,33 @@ async function httpGetJobById(req, res) {
 
             console.log('not in cache');
             serverCache.set(id, url);
-            res.redirect(url);
+            return res.redirect(url);
         }
 
     } catch (error) {
         console.log(error);
-        res.send('Some error there !!');
+        return res.send('Some error there !!');
     }
-
 }
+
+async function httpGetJobsByCategoryById(req, res) {
+    try {
+        const id = req.params.id;
+        const profile = id.split(/(?=[A-Z])/).join(' ');
+
+        var jobByProfile = jobs.filter(job => job.title.includes(profile));
+        res.status(200).send(jobByProfile);
+    } catch (error) {
+        console.log(error);
+        return res.send('Some error there !!');
+    }
+}
+
 
 module.exports = {
     loadAllJobs_1,
     httpGetAllJobs,
-    httpGetJobById
+    httpGetJobsByCategory,
+    httpGetJobById,
+    httpGetJobsByCategoryById
 }

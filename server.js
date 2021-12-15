@@ -12,7 +12,7 @@ app.use(helmet());
 app.use('/jobs', jobsRouter);
 
 app.get('/*', (req, res) => {
-    res.json('Welcome to homepage!!. Please use /jobs to get jobs list and also use json viewer in browser');
+    res.sendFile(__dirname + '/public/index.html');
 });
 
 async function startServer() {
