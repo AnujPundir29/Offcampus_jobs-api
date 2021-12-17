@@ -123,10 +123,13 @@ async function httpGetJobById(req, res) {
                 applyData = await getUrlandTitle(JOB_URL, 'a:contains("Click")');
             }
             const url = applyData[0].attribs.href;
-
+            
+            applyData = await getUrlandTitle(url, 'a:contains("Click")');
+            const originalUrl = applyData[0].attribs.href;
+            
             console.log('not in cache');
-            serverCache.set(id, url);
-            return res.redirect(url);
+            serverCache.set(id, originalUrl);
+            return res.redirect(originalUrl);
         }
 
     } catch (error) {
