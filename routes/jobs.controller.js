@@ -49,12 +49,14 @@ async function loadAllJobs_1() {
     try {
         for (let j = 0; j < platforms.length; j++) {
             const platform = platforms[j];
-            for (let page = 1; page <= 5; page++) {
+            for (let page = 1; page <= 8; page++) {
                 const WEB_URL = platform.address + page;
                 const jobsData = await getUrlandTitle(WEB_URL, 'a:contains("2022")');
 
                 for (var i = 0; i < jobsData.length; i++) {
-                    const title = jobsData[i].attribs.title + '';
+                    // const title = jobsData[i].attribs.title + '';
+                    var title = jobsData[i].children[0].data + '';
+                    title = title.split(',')[0];
                     const url = jobsData[i].attribs.href + '';
                     var result = jobs.filter(x => x.title === title);
                     if (result.length === 0 && title !== "undefined") {
@@ -69,7 +71,7 @@ async function loadAllJobs_1() {
                         });
                         var jobProfile = title.split('|')[1].trim();
                         var jobProfileId = jobProfile.replace(/\s/g, '');
-                        if(jobProfile.indexOf('Software') !== -1){
+                        if (jobProfile.indexOf('Software') !== -1) {
                             jobProfile = 'Software';
                             jobProfileId = 'Software';
                         }
